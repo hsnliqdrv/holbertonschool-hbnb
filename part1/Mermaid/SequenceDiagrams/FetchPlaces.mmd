@@ -1,0 +1,12 @@
+sequenceDiagram
+participant User
+participant API
+participant BusinessLogic
+participant Database
+
+User ->> API: Fetch places
+API ->> BusinessLogic: Fetch places
+BusinessLogic ->> Database: Find places based on criteria
+Database -->> BusinessLogic: The list of entities
+BusinessLogic -->> API: The list of places
+API -->> User: The list of places

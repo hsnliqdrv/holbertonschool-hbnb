@@ -1,0 +1,17 @@
+sequenceDiagram
+participant User
+participant API
+participant BusinessLogic
+participant Database
+
+User ->> API: Register new user
+API ->> BusinessLogic: Create user
+BusinessLogic ->> BusinessLogic: Validate data
+alt validation fails
+    BusinessLogic -->> API: Return error
+    API -->> User: Report failure
+end
+BusinessLogic ->> Database: Save data
+Database -->> BusinessLogic: Confirm save
+BusinessLogic -->> API: Confirm creation
+API -->> User: Report success

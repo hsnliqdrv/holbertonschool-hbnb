@@ -1,0 +1,55 @@
+classDiagram
+class BaseEntity {
+    <<Abstract>>
+    +String ID
+    +Date CreationDate
+    +Date LastUpdateDate
+}
+class User {
+    +String firstName
+    +String lastName
+    +String email
+    +String password
+    +Boolean isAdmin
+    +class register(): User
+    +instance updateProfile(): None
+    +instance delete(): None
+}
+class Place {
+    +String title
+    +String description
+    +Float price
+    +Float latitude
+    +Float longitude
+    +String ownerID
+    +class create(): Place
+    +static ListByOwner(): PlaceList
+    +instance update(): None
+    +instance delete(): None
+}
+class Amenity {
+    +String name
+    +String description
+    +class create(): Amenity
+    +static listByPlace(): AmenityList
+    +instance update(): None
+    +instance delete(): None
+}
+class Review {
+    +String placeID
+    +String userID
+    +Float rating
+    +String comment
+    +class create(): Review
+    +static listByPlace(): ReviewList
+    +instance update(): None
+    +instance delete(): None
+}
+User --|> BaseEntity : Inheritance
+Place --|> BaseEntity : Inheritance
+Amenity --|> BaseEntity: Inheritance
+Review --|> BaseEntity: Inheritance
+User *--  Place : Composition(0..*)
+Place o-- Amenity: Aggregation(0..*)
+Place *-- Review: Composition(0..*)
+User *-- Review: Composition(0..*)

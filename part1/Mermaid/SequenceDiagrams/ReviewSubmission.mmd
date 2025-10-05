@@ -1,0 +1,17 @@
+sequenceDiagram
+participant User
+participant API
+participant BusinessLogic
+participant Database
+
+User ->> API: New Review
+API ->> BusinessLogic: New Review
+BusinessLogic ->> BusinessLogic: Validate Place, User, Review Content
+alt validation fails
+    BusinessLogic -->> API: Return Error
+    API -->> User: Report Failure 
+end
+BusinessLogic ->> Database: Save data
+Database -->> BusinessLogic: Confirm save
+BusinessLogic -->> API: Confirm creation
+API -->> User: Report success
