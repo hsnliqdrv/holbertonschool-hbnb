@@ -1,6 +1,6 @@
-import base
+from .base import BaseModel
 
-class Amenity(base.BaseModel):
+class Amenity(BaseModel):
     def __init__(self, name, description=""):
         self.name = name
         self.description = description

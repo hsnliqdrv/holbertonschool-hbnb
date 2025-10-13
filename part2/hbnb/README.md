@@ -38,3 +38,109 @@ place.addAmenity(amenity)
 review = Review(place.id, user.id, 5.0, "Excellent option!")
 place.addReview(review)
 ```
+
+# API
+
+## Users
+User model:
+```json
+{
+  "first_name": String,
+  "last_name": String,
+  "email": String
+}
+```
+### Register a user
+```
+POST /api/v1/users/
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com"
+}
+```
+Expected Response:
+```
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com"
+}
+
+// 201 Created
+```
+Possible Status Codes:
+
+201 Created: When the user is successfully created.
+400 Bad Request: If the email is already registered or input data is invalid.
+### Get list of users
+```
+GET /api/v1/users/
+Content-Type: application/json
+```
+Expected Response:
+```
+[
+  {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com"
+  },
+  ...
+]
+
+// 200 OK
+```
+Possible Status Codes:
+
+200 OK: When the list of users is successfully retrieved.
+### Get a user
+```
+GET /api/v1/users/<user_id>
+Content-Type: application/json
+```
+Expected Response:
+```
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@x.com"
+}
+// 200 OK
+```
+Possible Status Codes:
+
+200 OK: When the user is successfully retrieved.
+404 Not Found: If the user does not exist.
+### Update a user
+```
+PUT /api/v1/users/<user_id>
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "email": "jane.doe@example.com"
+}
+```
+Expected Response:
+```
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "email": "jane.doe@example.com"
+}
+
+// 200 OK
+```
+Possible Status Codes:
+
+200 OK: When the user is successfully updated.
+404 Not Found: If the user does not exist.
+400 Bad Request: If input data is invalid.

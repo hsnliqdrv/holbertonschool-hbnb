@@ -1,6 +1,6 @@
-import base
+from .base import BaseModel
 
-class Place(base.BaseModel):
+class Place(BaseModel):
     def __init__(self, title="", description="", price, latitude, logitude, owner):
         super().__init__()
         self.title = title

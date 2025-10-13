@@ -1,13 +1,13 @@
-import base 
+from .base import BaseModel
 
-class User(base.BaseModel):
-    def __init__(self, email, password, isAdmin, firstName="", lastName=""):
+class User(BaseModel):
+    def __init__(self, email="", password="", isAdmin=False, first_name="", last_name=""):
         super().__init__()
         self.email = email
         self.password = password
         self.isAdmin = isAdmin
-        self.firstName = firstName
-        self.lastName = lastName
+        self.first_name = first_name
+        self.last_name = last_name
         self.places = []
         self.reviews = []
     def addPlace(self, place):
