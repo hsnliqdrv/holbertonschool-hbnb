@@ -74,8 +74,8 @@ Expected Response:
 ```
 Possible Status Codes:
 
-201 Created: When the user is successfully created.
-400 Bad Request: If the email is already registered or input data is invalid.
+- 201 Created: When the user is successfully created.
+- 400 Bad Request: If the email is already registered or input data is invalid.
 ### Get list of users
 ```
 GET /api/v1/users/
@@ -97,7 +97,7 @@ Expected Response:
 ```
 Possible Status Codes:
 
-200 OK: When the list of users is successfully retrieved.
+- 200 OK: When the list of users is successfully retrieved.
 ### Get a user
 ```
 GET /api/v1/users/<user_id>
@@ -115,8 +115,8 @@ Expected Response:
 ```
 Possible Status Codes:
 
-200 OK: When the user is successfully retrieved.
-404 Not Found: If the user does not exist.
+- 200 OK: When the user is successfully retrieved.
+- 404 Not Found: If the user does not exist.
 ### Update a user
 ```
 PUT /api/v1/users/<user_id>
@@ -141,6 +141,6 @@ Expected Response:
 ```
 Possible Status Codes:
 
-200 OK: When the user is successfully updated.
-404 Not Found: If the user does not exist.
-400 Bad Request: If input data is invalid.
+- 200 OK: When the user is successfully updated.
+- 404 Not Found: If the user does not exist.
+- 400 Bad Request: If input data is invalid.
