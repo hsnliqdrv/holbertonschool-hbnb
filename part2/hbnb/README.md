@@ -15,3 +15,26 @@ $ pip install -r requirements.txt
 # Run the app
 $ python run.py
 ```
+# Information About Models
+## User
+This model represents a user. A user have profile and can be regular user or admin.
+Users can make reviews, add and own places.
+## Place
+This model represents a place. A place has an owner and amenities associated with
+it. A place can have reviews from users.
+## Review
+This model represents a review. A review is consisted of rating point
+and comment. Reviews are owned by places and users.
+## Amenity
+This model represents an amenity. An amenity is an additional
+feature of a place.
+### Examples
+```python
+user = User("John", "Doe", "johndoe@abc.com", "****", False)
+amenity = Amenity("Wi-Fi", "Wi-Fi service")
+place = Place("My home", 150.0, 45, 45, user)
+user.addPlace(place)
+place.addAmenity(amenity)
+review = Review(place.id, user.id, 5.0, "Excellent option!")
+place.addReview(review)
+```
