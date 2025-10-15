@@ -144,3 +144,115 @@ Possible Status Codes:
 - 200 OK: When the user is successfully updated.
 - 404 Not Found: If the user does not exist.
 - 400 Bad Request: If input data is invalid.
+
+## Amenities
+Amenity Model:
+```json
+{
+    "name": String
+}
+```
+### Register a New Amenity (POST /api/v1/amenities/)
+
+```http
+POST /api/v1/amenities/
+Content-Type: application/json
+
+{
+  "name": "Wi-Fi"
+}
+```
+
+Expected Response:
+
+```jsonc
+{
+  "id": "1fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Wi-Fi"
+}
+
+// 201 Created
+```
+
+Possible Status Codes:
+
+- 201 Created: When the amenity is successfully created.
+- 400 Bad Request: If input data is invalid.
+
+### Retrieve All Amenities (GET /api/v1/amenities/)
+
+```http
+GET /api/v1/amenities/
+Content-Type: application/json
+```
+
+Expected Response:
+
+```jsonc
+[
+  {
+    "id": "1fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Wi-Fi"
+  },
+  {
+    "id": "2fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Air Conditioning"
+  }
+]
+
+// 200 OK
+```
+
+Possible Status Codes:
+
+- 200 OK: List of amenities retrieved successfully.
+
+### Retrieve an Amenity’s Details (GET /api/v1/amenities/<amenity_id>)
+
+```http
+GET /api/v1/amenities/<amenity_id>
+Content-Type: application/json
+```
+
+Expected Response:
+
+```jsonc
+{
+  "id": "1fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Wi-Fi"
+}
+
+// 200 OK
+```
+
+Possible Status Codes:
+
+- 200 OK: When the amenity is successfully retrieved.
+- 404 Not Found: If the amenity does not exist.
+
+### Update an Amenity’s Information (PUT /api/v1/amenities/<amenity_id>)
+
+```http
+PUT /api/v1/amenities/<amenity_id>
+Content-Type: application/json
+
+{
+  "name": "Air Conditioning"
+}
+```
+
+Expected Response:
+
+```jsonc
+{
+  "message": "Amenity updated successfully"
+}
+
+// 200 OK
+```
+
+Possible Status Codes:
+
+- 200 OK: When the amenity is successfully updated.
+- 404 Not Found: If the amenity does not exist.
+- 400 Bad Request: If input data is invalid.
