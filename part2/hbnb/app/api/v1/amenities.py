@@ -28,7 +28,7 @@ class AmenityList(Resource):
         try:
             data = facade.create_amenity(amenity_data)
         except ValueError as e:
-            return {'error': 'Invalid input data: ' + str(e)}
+            return {'error': 'Invalid input data: ' + str(e)}, 400
         return api.marshal(data, amenity_model_output), 201
 
     @api.response(200, 'List of amenities retrieved successfully', [amenity_model_output])
@@ -53,11 +53,11 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """Update an amenity's information"""
-        if not facade.get_amenity(amenity_id):
-            return {"error": "Amenity not found"}, 404
         data = api.payload
         try:
             facade.update_amenity(amenity_id, data)
         except ValueError as e:
-            return {'error': 'Invalid input data: ' + str(e)}
+            return {'error': 'Invalid input data: ' + str(e)}, 400
+        except AmenityNotFoundError:
+            return {"error": "Amenity not found"}, 404
         return {"message":"Amenity updated successfully"}, 200

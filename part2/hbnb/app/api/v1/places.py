@@ -32,7 +32,7 @@ place_model_details = api.model('Place', {
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
     'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's"),
+    'amenities': fields.List(fields.Nested(amenity_model), required=True, description="List of amenities"),
     'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
 })
 place_model_create = api.model('Place Creation Input', {
@@ -98,7 +98,18 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
-        return api.marshal(place, place_model_details), 200
+        obj = {
+                'title': place.title,
+                'description': place.description,
+                'price': place.price,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+                'owner_id': place.owner_id,
+                'owner': facade.get_user(place.owner_id),
+                'amenities': [facade.get_amenity(i) for i in place.amenities],
+                'reviews': [facade.get_review(i) for i in place.reviews]
+        }
+        return api.marshal(obj, place_model_details), 200
 
     @api.expect(place_model_update)
     @api.response(200, 'Place updated successfully', message)
@@ -106,10 +117,10 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        if not facade.get_place(place_id):
-            return {"error": "Place not found"}, 404
         try:
             facade.update_place(self, api.payload)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
+        except PlaceNotFoundError:
+            return {"error": "Place not found"}, 404
         return {"message":"Place updated successfully"}, 200

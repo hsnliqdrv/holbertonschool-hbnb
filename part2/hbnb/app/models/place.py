@@ -1,7 +1,7 @@
 from .base import BaseModel
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, latitude, logitude, owner_id, amenities):
+    def __init__(self, title, description="", price, latitude, logitude, owner_id):
         super().__init__()
         self.title = title
         self.description = description
@@ -10,7 +10,7 @@ class Place(BaseModel):
         self.longitude = longitude
         self.ownerId = ownerId
         self.reviews = []
-        self.amenities = amenities
+        self.amenities = []
 
     @property
     def title(self):

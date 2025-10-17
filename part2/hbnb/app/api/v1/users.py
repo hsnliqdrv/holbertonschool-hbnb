@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.errors import *
 
 api = Namespace('users', description='User operations')
 
@@ -33,13 +34,12 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-        existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user:
-            return {'error': 'Email already registered'}, 400
         try:
             new_user = facade.create_user(user_data)
         except ValueError as e:
-            return {"error": "Invalid input data: " + str(e)}
+            return {"error": "Invalid input data: " + str(e)}, 400
+        except EmailTakenError:
+            return {"error": "Email already registered"}, 400
         return api.marshal(new_user, create_user_output), 201
     @api.response(200, 'User list retrieved successfully', [create_user_output])
     def get(self):
@@ -65,13 +65,12 @@ class UserResource(Resource):
     def put(self, user_id):
         """Update a user"""
         user_data = api.payload
-        existing_user = facade.get_user(user_id)
-        if not existing_user:
-            return {'error': 'User not found'}, 404
-        if "email" in user_data and facade.get_user_by_email(user_data["email"]):
-            return {'error': 'Email is taken'}, 400
         try:
             new_data = facade.update_user(user_id, user_data)
         except ValueError as e:
-            return {'error': 'Invalid input data: ' + str(e)}
+            return {'error': 'Invalid input data: ' + str(e)}, 400
+        except UserNotFoundError:
+            return {"error": "User not found"}, 404
+        except EmailTakenError:
+            return {"error": "Email is taken"}, 400
         return api.marshal(new_data, create_user_output), 200
