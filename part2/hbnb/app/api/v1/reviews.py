@@ -1,27 +1,31 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.errors import *
-
 api = Namespace('reviews', description='Review operations')
 
 # Define the review model for input validation and documentation
-review_model = api.model('Review', {
+review_model = api.model('Review Model Create', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
-review_model_output = api.model('Review', {
+review_model_output = api.model('Review Model Create Output', {
     'id': fields.String(required=True, description='ID of the review'),
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
-review_all_output = api.model('Review', {
+review_all_output = api.model('Review Model Get All', {
     'id': fields.String(required=True, description='ID of the review'),
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+})
+
+review_model_update = api.model('Review Model Update', {
+    'text': fields.String(required=True, description='Text of the review'),
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)')
 })
 
 error = api.model('Error', {
@@ -35,9 +39,7 @@ message = api.model('Message', {
 class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created', review_model_output)
-    @api.response(400, 'Referenced user not found', error)
-    @api.response(400, 'Referenced place not found', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def post(self):
         """Register a new review"""
         try:
@@ -69,7 +71,7 @@ class ReviewResource(Resource):
     @api.expect(review_model_update)
     @api.response(200, 'Review updated successfully', message)
     @api.response(404, 'Review not found', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def put(self, review_id):
         """Update a review's information"""
         try:
@@ -90,14 +92,3 @@ class ReviewResource(Resource):
             return {"error": "Review not found"}, 404
         return {"message": "Review deleted successfully"}, 200
 
-@api.route('/places/<place_id>/reviews')
-class PlaceReviewList(Resource):
-    @api.response(200, 'List of reviews for the place retrieved successfully', review_all_output)
-    @api.response(404, 'Place not found', error)
-    def get(self, place_id):
-        """Get all reviews for a specific place"""
-        try:
-            reviews = facade.get_reviews_by_place(place_id)
-        except PlaceNotFoundError:
-            return {"error": "Place not found"}, 404
-        return [api.marshal(r, review_all_output) for r in reviews], 200

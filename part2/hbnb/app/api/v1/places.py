@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-
+from app.models.errors import *
 api = Namespace('places', description='Place operations')
 
 # Define the models for related entities
@@ -63,6 +63,11 @@ place_model_update = api.model('Place Model Update Input', {
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(description='Price per night'),
 })
+review_all_output = api.model('Review Model Get All', {
+    'id': fields.String(required=True, description='ID of the review'),
+    'text': fields.String(required=True, description='Text of the review'),
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+})
 error = api.model('Error', {
     'error': fields.String(required=True, description='Error description')
 })
@@ -74,7 +79,7 @@ message = api.model('Message', {
 class PlaceList(Resource):
     @api.expect(place_model_create)
     @api.response(201, 'Place successfully created', place_model_create_output)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def post(self):
         """Register a new place"""
         place_data = api.payload
@@ -82,7 +87,9 @@ class PlaceList(Resource):
             place = facade.create_place(place_data)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
-        return api.marshal(place), 201
+        except UserNotFoundError:
+            return {"error": "Referenced user not found"}, 400
+        return api.marshal(place, place_model_create_output), 201
 
     @api.response(200, 'List of places retrieved successfully', [get_all_model])
     def get(self):
@@ -114,13 +121,26 @@ class PlaceResource(Resource):
     @api.expect(place_model_update)
     @api.response(200, 'Place updated successfully', message)
     @api.response(404, 'Place not found', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def put(self, place_id):
         """Update a place's information"""
         try:
-            facade.update_place(self, api.payload)
+            facade.update_place(place_id, api.payload)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
         except PlaceNotFoundError:
             return {"error": "Place not found"}, 404
         return {"message":"Place updated successfully"}, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully', review_all_output)
+    @api.response(404, 'Place not found', error)
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        try:
+            reviews = facade.get_reviews_by_place(place_id)
+        except PlaceNotFoundError:
+            return {"error": "Place not found"}, 404
+        return [api.marshal(r, review_all_output) for r in reviews], 200
+

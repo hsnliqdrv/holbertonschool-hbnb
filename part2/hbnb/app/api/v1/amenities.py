@@ -1,12 +1,13 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.errors import *
 
 api = Namespace('amenities', description='Amenity operations')
 
-amenity_model_input = api.model('Amenity', {
+amenity_model_input = api.model('Amenity Create Input', {
     'name': fields.String(required=True, description='Name of the amenity')
 })
-amenity_model_output = api.model('Amenity', {
+amenity_model_output = api.model('Amenity Create Output', {
     'id': fields.String(required=True, description='ID of amenity'),
     'name': fields.String(required=True, description='Name of the amenity')
 })
@@ -21,7 +22,7 @@ message = api.model('Message', {
 class AmenityList(Resource):
     @api.expect(amenity_model_input)
     @api.response(201, 'Amenity successfully created', amenity_model_output)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def post(self):
         """Create an amenity"""
         amenity_data = api.payload
@@ -50,7 +51,7 @@ class AmenityResource(Resource):
     @api.expect(amenity_model_input)
     @api.response(200, 'Amenity updated successfully', message)
     @api.response(404, 'Amenity not found', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def put(self, amenity_id):
         """Update an amenity's information"""
         data = api.payload

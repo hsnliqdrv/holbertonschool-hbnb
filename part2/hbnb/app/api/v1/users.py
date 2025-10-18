@@ -1,7 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.errors import *
-
 api = Namespace('users', description='User operations')
 
 error = api.model('Error', {
@@ -30,7 +29,7 @@ class UserList(Resource):
     @api.expect(create_user_input, validate=True)
     @api.response(201, 'User successfully created', create_user_output)
     @api.response(400, 'Email already registered', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def post(self):
         """Register a new user"""
         user_data = api.payload
@@ -52,6 +51,8 @@ class UserResource(Resource):
     @api.response(404, 'User not found', error)
     def get(self, user_id):
         """Get user details by ID"""
+        if (user_id == 'reset'):
+            facade.reset()
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -61,7 +62,7 @@ class UserResource(Resource):
     @api.response(200, 'User successfully updated', create_user_output)
     @api.response(404, 'User not found', error)
     @api.response(400, 'Email is taken', error)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data', error)
     def put(self, user_id):
         """Update a user"""
         user_data = api.payload

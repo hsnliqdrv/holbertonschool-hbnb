@@ -6,7 +6,7 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 class User(BaseModel):
-    def __init__(self, email, password="", isAdmin=False, first_name, last_name):
+    def __init__(self, email, first_name, last_name, password="", isAdmin=False):
         super().__init__()
         self.email = email
         self.password = password
@@ -42,18 +42,14 @@ class User(BaseModel):
             raise ValueError("User.email should be valid email")
         self._email = value
     def addPlace(self, place):
-        if (place.id not in self.places):
-            self.places.append(place.id)
-            self.save()
+        self.places.append(place.id)
+        self.save()
     def addReview(self, review):
-        if (review.id not in self.reviews):
-            self.reviews.append(review.id)
-            self.save()
+        self.reviews.append(review.id)
+        self.save()
     def removePlace(self, place):
-        if (place.id in self.places):
-            self.places.remove(place.id)
-            self.save()
+        self.places.remove(place.id)
+        self.save()
     def removeReview(self, review):
-        if (review.id in self.reviews):
-            self.reviews.remove(review.id)
-            self.save()
+        self.reviews.remove(review.id)
+        self.save()
