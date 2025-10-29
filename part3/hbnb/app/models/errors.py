@@ -4,3 +4,7 @@ class UserNotFoundError(NotFoundError): pass
 class PlaceNotFoundError(NotFoundError): pass
 class AmenityNotFoundError(NotFoundError): pass
 class ReviewNotFoundError(NotFoundError): pass
+class DoesNotOwnPlaceError(Exception): pass
+class CannotReviewOwnPlaceError(Exception): pass
+class AlreadyReviewedError(Exception): pass
+class CannotUpdateOthersError(Exception): pass

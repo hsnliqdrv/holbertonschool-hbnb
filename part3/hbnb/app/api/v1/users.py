@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.errors import *
+from flask_jwt_extended import jwt_required, get_jwt_identity
 api = Namespace('users', description='User operations')
 
 error = api.model('Error', {
@@ -10,7 +11,8 @@ error = api.model('Error', {
 create_user_input = api.model('Create User Input',{
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
-    'email': fields.String(required=True, description='Email of the user')
+    'email': fields.String(required=True, description='Email of the user'),
+    'password': fields.String(required=True, description='Password of the user')
 })
 create_user_output = api.model('Create User Output',{
     'id': fields.String(required=True, description='ID of the user'),
@@ -51,8 +53,6 @@ class UserResource(Resource):
     @api.response(404, 'User not found', error)
     def get(self, user_id):
         """Get user details by ID"""
-        if (user_id == 'reset'):
-            facade.reset()
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -61,17 +61,22 @@ class UserResource(Resource):
     @api.expect(update_user_input, validate=True)
     @api.response(200, 'User successfully updated', create_user_output)
     @api.response(404, 'User not found', error)
+    @api.response(403, 'Unauthorized action', error)
     @api.response(400, 'Email is taken', error)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def put(self, user_id):
         """Update a user"""
+        requester_id = get_jwt_identity()
         user_data = api.payload
         try:
-            new_data = facade.update_user(user_id, user_data)
+            new_data = facade.update_user(requester_id, user_id, user_data)
         except ValueError as e:
             return {'error': 'Invalid input data: ' + str(e)}, 400
         except UserNotFoundError:
             return {"error": "User not found"}, 404
         except EmailTakenError:
             return {"error": "Email is taken"}, 400
+        except CannotUpdateOthersError:
+            return {"error": "Cannot edit other users"}, 403
         return api.marshal(new_data, create_user_output), 200

@@ -20,7 +20,7 @@ message = api.model('Message', {
 
 @api.route('/')
 class AmenityList(Resource):
-    @api.expect(amenity_model_input)
+    @api.expect(amenity_model_input, validate=True)
     @api.response(201, 'Amenity successfully created', amenity_model_output)
     @api.response(400, 'Invalid input data', error)
     def post(self):
@@ -48,7 +48,7 @@ class AmenityResource(Resource):
             return {"error": "Amenity not found"}, 404
         return api.marshal(data, amenity_model_output), 200
 
-    @api.expect(amenity_model_input)
+    @api.expect(amenity_model_input, validate=True)
     @api.response(200, 'Amenity updated successfully', message)
     @api.response(404, 'Amenity not found', error)
     @api.response(400, 'Invalid input data', error)

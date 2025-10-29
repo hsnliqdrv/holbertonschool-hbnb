@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.errors import *
+from flask_jwt_extended import jwt_required, get_jwt_identity
 api = Namespace('places', description='Place operations')
 
 # Define the models for related entities
@@ -41,7 +42,6 @@ place_model_create = api.model('Place Creation Input', {
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
 })
 place_model_create_output = api.model('Place Model Creation Output', {
     'id': fields.String(required=True, description='ID of the place'),
@@ -77,12 +77,15 @@ message = api.model('Message', {
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model_create)
+    @api.expect(place_model_create, validate=True)
     @api.response(201, 'Place successfully created', place_model_create_output)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def post(self):
         """Register a new place"""
+        user_id = get_jwt_identity()
         place_data = api.payload
+        place_data["owner_id"] = user_id
         try:
             place = facade.create_place(place_data)
         except ValueError as e:
@@ -118,18 +121,23 @@ class PlaceResource(Resource):
         }
         return api.marshal(obj, place_model_details), 200
 
-    @api.expect(place_model_update)
+    @api.expect(place_model_update, validate=True)
     @api.response(200, 'Place updated successfully', message)
     @api.response(404, 'Place not found', error)
+    @api.response(403, 'Unauthorized action', error)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
+        user_id = get_jwt_identity()
         try:
-            facade.update_place(place_id, api.payload)
+            facade.update_place(user_id, place_id, api.payload)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
         except PlaceNotFoundError:
             return {"error": "Place not found"}, 404
+        except DoesNotOwnPlaceError:
+            return {"error": "User does not own the place"}, 403
         return {"message":"Place updated successfully"}, 200
 
 @api.route('/<place_id>/reviews')
