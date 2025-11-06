@@ -1,15 +1,8 @@
-from .base import BaseModel
+from app import db
+import uuid
+from .base import BaseModel  # Import BaseModel from its module
 
 class Amenity(BaseModel):
-    def __init__(self, name):
-        super().__init__()
-        self.name = name
+    __tablename__ = "amenities"
 
-    @property
-    def name(self):
-        return self._name
-    @name.setter
-    def name(self, value):
-        if (len(value) == 0):
-            raise ValueError("Amenity.name cannot be empty")
-        self._name = value
+    name = db.Column(db.String(50), nullable=False)

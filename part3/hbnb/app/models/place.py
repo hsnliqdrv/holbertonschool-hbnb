@@ -1,62 +1,39 @@
+from app import db
+import uuid
 from .base import BaseModel
+from sqlalchemy.orm import validates
 
 class Place(BaseModel):
-    def __init__(self, title, price, latitude, longitude, owner_id, description=""):
-        super().__init__()
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner_id = owner_id
-        self.reviews = []
-        self.amenities = []
+    __tablename__ = "places"
 
-    @property
-    def title(self):
-        return self._title
-    @title.setter
-    def title(self, value):
+    title = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(1000), nullable=True, default="")
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+
+    @validates("title")
+    def validate_title(self, key, value):
         if len(value) == 0:
-            raise ValueError("Place.title cannot be empty")
-        self._title = value
-
-    @property
-    def price(self):
-        return self._price
-    @price.setter
-    def price(self, value):
-        if (value < 0):
-            raise ValueError("Place.price must be non-negative")
-        self._price = value
-
-    @property
-    def latitude(self):
-        return self._latitude
-    @latitude.setter
-    def latitude(self, value):
-        if (abs(value) > 90):
-            raise ValueError("Place.latitude must be -90<=l<=90")
-        self._latitude = value
-
-    @property
-    def longitude(self):
-        return self._longitude
-    @longitude.setter
-    def longitude(self, value):
-        if (abs(value) > 180):
-            raise ValueError("Price longitude must be -180<=l<=180")
-        self._longitude = value
-
-    def addAmenity(self, amenity):
-        self.amenities.append(amenity.id)
-        self.save()
-    def addReview(self, review):
-        self.reviews.append(review.id)
-        self.save()
-    def removeAmenity(self, amenity):
-        self.amenities.remove(amenity.id)
-        self.save()
-    def removeReview(self, review):
-        self.reviews.remove(review.id)
-        self.save()
+            raise ValueError("title cannot be empty")
+        return value
+    @validates("description")
+    def validate_title(self, key, value):
+        if len(value) == 0:
+            raise ValueError("description cannot be empty")
+        return value
+    @validates("price")
+    def validate_rating(self, key, value):
+        if value < 0:
+            raise ValueError("price must not be negative")
+        return value
+    @validates("latitude")
+    def validate_rating(self, key, value):
+        if abs(value) > 90:
+            raise ValueError("latitude must be between -90 and 90")
+        return value
+    @validates("longitude")
+    def validate_rating(self, key, value):
+        if abs(value) > 180:
+            raise ValueError("latitude must be between -180 and 180")
+        return value

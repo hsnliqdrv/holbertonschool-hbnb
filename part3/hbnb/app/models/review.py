@@ -1,25 +1,21 @@
+from app import db
+import uuid
 from .base import BaseModel
+from sqlalchemy.orm import validates
 
 class Review(BaseModel):
-    def __init__(self, text, rating, user_id, place_id):
-        super().__init__()
-        self.text = text
-        self.rating = rating
-        self.user_id = user_id
-        self.place_id = place_id
-    @property
-    def rating(self):
-        return self._rating
-    @rating.setter
-    def rating(self, value):
-        if not (1 <= value <= 5):
-            raise ValueError("Review.rating must be between 1 and 5 (inclusive)")
-        self._rating = value
-    @property
-    def text(self):
-        return self._text
-    @text.setter
-    def text(self, value):
+    __tablename__ = "reviews"
+
+    text = db.Column(db.String(1000), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
+    @validates("text")
+    def validate_text(self, key, value):
         if len(value) == 0:
-            raise ValueError("Review.text cannot be empty")
-        self._text = value
+            raise ValueError("text cannot be empty")
+        return value
+    @validates("rating")
+    def validate_rating(self, key, value):
+        if not (1 <= value <= 5):
+            raise ValueError("rating must be between 1 and 5")
+        return value

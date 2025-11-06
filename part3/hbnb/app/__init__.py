@@ -4,6 +4,9 @@ bcrypt = Bcrypt()
 from flask_jwt_extended import JWTManager
 jwt = JWTManager()
 
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+
 from flask import Flask
 from flask_restx import Api
 from werkzeug.exceptions import BadRequest
@@ -18,12 +21,6 @@ def create_app(config_class="config.DevelopmentConfig"):
     app.config.from_object(config_class)
     api = Api(app, version='1.0', title='HBnB API', description='HBnB Application API', doc='/api/v1/')
     
-    @api.errorhandler(BadRequest)
-    def handle_validation_error(error):
-        return {
-            "error": "Invalid input data: " + str(error.description)
-        }, 400
-
     api.add_namespace(users_ns, path="/api/v1/users")
     api.add_namespace(amenities_ns, path="/api/v1/amenities")
     api.add_namespace(places_ns, path="/api/v1/places")
@@ -32,5 +29,6 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     return app
