@@ -130,8 +130,9 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         user_id = get_jwt_identity()
+        is_admin = get_jwt().get('is_admin')
         try:
-            facade.update_place(user_id, place_id, api.payload)
+            facade.update_place(user_id, place_id, api.payload, is_admin)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
         except PlaceNotFoundError:

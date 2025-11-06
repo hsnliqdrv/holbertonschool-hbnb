@@ -28,14 +28,12 @@ class HBnBFacade:
     def get_all_users(self):
         return self.user_repo.get_all()
 
-    def update_user(self, req_id, user_id, user_data):
+    def update_user(self, user_id, user_data):
         user = self.get_user(user_id)
         if (not user):
             raise UserNotFoundError
         if (user.email != user_data["email"] and self.get_user_by_email(user_data["email"])):
             raise EmailTakenError
-        if (req_id != user_id):
-            raise CannotUpdateOthersError
         self.user_repo.update(user_id, user_data)
         return self.get_user(user_id)
 
@@ -77,11 +75,11 @@ class HBnBFacade:
     def get_all_places(self):
         return self.place_repo.get_all()
 
-    def update_place(self, user_id, place_id, place_data):
+    def update_place(self, user_id, place_id, place_data, pass_ownership):
         place = self.get_place(place_id)
         if not place:
             raise PlaceNotFoundError
-        if user_id != place.owner_id:
+        if (not pass_ownership and user_id != place.owner_id):
             raise DoesNotOwnPlaceError
         self.place_repo.update(place_id, place_data)
         return self.get_place(place_id)
@@ -115,23 +113,23 @@ class HBnBFacade:
             raise PlaceNotFoundError
         return [self.get_review(review_id) for review_id in place.reviews]
 
-    def update_review(self, user_id, review_id, review_data):
+    def update_review(self, user_id, review_id, review_data, pass_ownership):
         review = self.get_review(review_id)
         if not review:
             raise ReviewNotFoundError
-        if review.user_id != user_id:
+        if not pass_ownership and review.user_id != user_id:
             raise DoesNotOwnReviewError
         self.review_repo.update(review_id, review_data)
         return self.get_review(review_id)
 
-    def delete_review(self, user_id, review_id):
+    def delete_review(self, user_id, review_id, pass_ownership):
         review = self.get_review(review_id)
         if not review:
             raise ReviewNotFoundError
-        if review.user_id != user_id:
+        if not pass_ownership and review.user_id != user_id:
             raise DoesNotOwnReviewError
-        place = self.get_place(review.place_id).removeReview(review)
-        user = self.get_user(review.user_id).removeReview(review)
+        self.get_place(review.place_id).removeReview(review)
+        self.get_user(review.user_id).removeReview(review)
         self.review_repo.delete(review_id)
 
     def reset(self):

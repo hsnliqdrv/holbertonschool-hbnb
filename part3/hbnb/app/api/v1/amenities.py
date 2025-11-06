@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.errors import *
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -22,9 +23,14 @@ message = api.model('Message', {
 class AmenityList(Resource):
     @api.expect(amenity_model_input, validate=True)
     @api.response(201, 'Amenity successfully created', amenity_model_output)
+    @api.response(403, 'Unauthorized action', error)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def post(self):
         """Create an amenity"""
+        jwt_payload = get_jwt()
+        if not jwt_payload.get('is_admin'):
+            return {"error": "Only admin can create amenities"}, 403
         amenity_data = api.payload
         try:
             data = facade.create_amenity(amenity_data)
@@ -51,9 +57,13 @@ class AmenityResource(Resource):
     @api.expect(amenity_model_input, validate=True)
     @api.response(200, 'Amenity updated successfully', message)
     @api.response(404, 'Amenity not found', error)
+    @api.response(403, 'Unauthorized action', error)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information"""
+        if not jwt_payload.get('is_admin'):
+            return {"error": "Only admin can update amenities"}, 403
         data = api.payload
         try:
             facade.update_amenity(amenity_id, data)

@@ -86,8 +86,9 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         user_id = get_jwt_identity()
+        is_admin = get_jwt().get('is_admin')
         try:
-            facade.update_review(user_id, review_id, api.payload)
+            facade.update_review(user_id, review_id, api.payload, is_admin)
         except ValueError as e:
             return {"error": "Invalid input data: " + str(e)}, 400
         except ReviewNotFoundError:
@@ -102,8 +103,10 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """Delete a review"""
+        user_id = get_jwt_identity()
+        is_admin = get_jwt().get('is_admin')
         try:
-            facade.delete_review(user_id, review_id)
+            facade.delete_review(user_id, review_id, is_admin)
         except ReviewNotFoundError:
             return {"error": "Review not found"}, 404
         except DoesNotOwnReviewError:

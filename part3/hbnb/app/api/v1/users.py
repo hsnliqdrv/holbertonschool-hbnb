@@ -30,10 +30,15 @@ update_user_input = api.model('Update User Input', {
 class UserList(Resource):
     @api.expect(create_user_input, validate=True)
     @api.response(201, 'User successfully created', create_user_output)
+    @api.response(403, 'Unauthorized action', error)
     @api.response(400, 'Email already registered', error)
     @api.response(400, 'Invalid input data', error)
+    @jwt_required()
     def post(self):
         """Register a new user"""
+        jwt_payload = get_jwt()
+        if not jwt_payload.get('is_admin'):
+            return {"error": "Only admin can create users"}, 403
         user_data = api.payload
         try:
             new_user = facade.create_user(user_data)
@@ -67,16 +72,18 @@ class UserResource(Resource):
     @jwt_required()
     def put(self, user_id):
         """Update a user"""
-        requester_id = get_jwt_identity()
+        jwt_payload = get_jwt()
+        if not jwt_payload.get('is_admin'):
+            return {"error": "Only admin can update users"}, 403
+        if get_jwt_identity() != user_id:
+            return {"error": "Cannot edit other users"}, 403
         user_data = api.payload
         try:
-            new_data = facade.update_user(requester_id, user_id, user_data)
+            new_data = facade.update_user(user_id, user_data)
         except ValueError as e:
             return {'error': 'Invalid input data: ' + str(e)}, 400
         except UserNotFoundError:
             return {"error": "User not found"}, 404
         except EmailTakenError:
             return {"error": "Email is taken"}, 400
-        except CannotUpdateOthersError:
-            return {"error": "Cannot edit other users"}, 403
         return api.marshal(new_data, create_user_output), 200
