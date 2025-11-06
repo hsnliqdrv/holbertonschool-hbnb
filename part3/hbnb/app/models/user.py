@@ -1,7 +1,8 @@
 from app import db, bcrypt
 import uuid
 from .base import BaseModel  # Import BaseModel from its module
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
+import re
 
 def is_valid_email(email):
     """Check if email has valid pattern"""
@@ -9,13 +10,15 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 class User(BaseModel):
-     __tablename__ = 'users'
+    __tablename__ = 'users'
 
-     first_name = db.Column(db.String(50), nullable=False)
-     last_name = db.Column(db.String(50), nullable=False)
-     email = db.Column(db.String(120), nullable=False, unique=True)
-     password = db.Column(db.String(128), nullable=False)
-     is_admin = db.Column(db.Boolean, default=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    places = relationship('Place', backref='owner', lazy=True)
+    reviews = relationship('Review', backref='user', lazy=True)
 
     def hash_password(self, password):
         """Hash the password before storing it."""
@@ -32,13 +35,13 @@ class User(BaseModel):
         return value
 
     @validates("last_name")
-    def validate_first_name(self, key, value):
+    def validate_last_name(self, key, value):
         if len(value) == 0:
             raise ValueError("last_name cannot be empty")
         return value
 
     @validates("email")
-    def validate_first_name(self, key, value):
+    def validate_email_name(self, key, value):
         if not is_valid_email(value):
             raise ValueError("invalid email")
         return value

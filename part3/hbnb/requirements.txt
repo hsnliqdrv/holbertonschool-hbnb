@@ -1,4 +1,3 @@
-unittest
 flask
 flask-restx
 flask-bcrypt
