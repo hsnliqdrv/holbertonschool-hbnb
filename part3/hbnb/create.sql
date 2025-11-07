@@ -1,5 +1,14 @@
+-- Create the main table
+CREATE TABLE entities (
+    id CHAR(36) PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE users (
     id CHAR(36) PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     first_name TEXT,
     last_name TEXT,
     email TEXT UNIQUE,
@@ -9,6 +18,8 @@ CREATE TABLE users (
 
 CREATE TABLE places (
     id CHAR(36) PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     title TEXT,
     description TEXT,
     price REAL,
@@ -20,6 +31,8 @@ CREATE TABLE places (
 
 CREATE TABLE reviews (
     id CHAR(36) PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     text TEXT,
     rating INTEGER CHECK (rating BETWEEN 1 AND 5),
     user_id CHAR(36),
@@ -31,6 +44,8 @@ CREATE TABLE reviews (
 
 CREATE TABLE amenities (
     id CHAR(36) PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     name TEXT UNIQUE
 );
 
