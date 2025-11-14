@@ -21,7 +21,8 @@ review_model = api.model('PlaceReview', {
     'id': fields.String(description='Review ID'),
     'text': fields.String(description='Text of the review'),
     'rating': fields.Integer(description='Rating of the place (1-5)'),
-    'user_id': fields.String(description='ID of the user')
+    'user_id': fields.String(description='ID of the user'),
+    'user': fields.Nested(user_model, description='Owner of the review')
 })
 
 # Define the place model for input validation and documentation
@@ -57,6 +58,7 @@ get_all_model = api.model('Get all places model', {
     'title': fields.String(required=True, description='Title of the place'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'price': fields.Float(required=True, description='Price')
 })
 place_model_update = api.model('Place Model Update Input', {
     'title': fields.String(description='Title of the place'),
@@ -108,18 +110,7 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
-        obj = {
-                'title': place.title,
-                'description': place.description,
-                'price': place.price,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-                'owner_id': place.owner_id,
-                'owner': facade.get_user(place.owner_id),
-                'amenities': [facade.get_amenity(i) for i in place.amenities],
-                'reviews': [facade.get_review(i) for i in place.reviews]
-        }
-        return api.marshal(obj, place_model_details), 200
+        return api.marshal(place, place_model_details), 200
 
     @api.expect(place_model_update, validate=True)
     @api.response(200, 'Place updated successfully', message)

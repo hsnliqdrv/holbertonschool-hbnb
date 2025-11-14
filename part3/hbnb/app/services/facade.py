@@ -69,7 +69,6 @@ class HBnBFacade:
         if (not owner):
             raise UserNotFoundError
         place = Place(**place_data)
-        owner.addPlace(place)
         self.place_repo.add(place)
         return place
 
@@ -97,11 +96,9 @@ class HBnBFacade:
             raise PlaceNotFoundError
         if (self.user_owns_place(user.id, place.id)):
             raise CannotReviewOwnPlaceError
-        if (user.id in [facade.get_review(r).user_id for r in place.reviews]):
+        if (user.id in [review.user_id for review in place.reviews]):
             raise AlreadyReviewedError
         review = Review(**review_data)
-        user.addReview(review)
-        place.addReview(review)
         self.review_repo.add(review)
         return review
 
@@ -115,7 +112,7 @@ class HBnBFacade:
         place = self.get_place(place_id)
         if not place:
             raise PlaceNotFoundError
-        return [self.get_review(review_id) for review_id in place.reviews]
+        return place.reviews
 
     def update_review(self, user_id, review_id, review_data, pass_ownership):
         review = self.get_review(review_id)

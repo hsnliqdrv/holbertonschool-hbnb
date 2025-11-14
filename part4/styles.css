@@ -1,0 +1,168 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.5;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ff9800;
+    color: #fff;
+    padding: 1rem 2rem;
+}
+
+header .logo {
+    max-height: 50px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 1rem;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    max-width: 800px;
+    margin: 2rem auto 6rem;
+    padding: 0 1rem;
+}
+
+section#title,
+section#filter,
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+section#filter {
+    margin-bottom: 30px;
+}
+
+section#filter > label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+section#places-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.details-button,
+#review-form > button,
+#login-form > button {
+    background-color: #ff9800;
+    padding: 10px;
+    width: 120px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.details-button:hover,
+#review-form > button:hover,
+#login-form > button:hover {
+    background-color: #e68900;
+}
+
+#review-form > button {
+    width: auto;
+}
+
+#review-form,
+#place-details,
+.place-card,
+.review-card,
+#login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    min-height: 200px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px #ccc;
+}
+
+#review-form {
+    min-height: 150px;
+    align-items: stretch;
+    text-align: left;
+}
+
+#review-form label,
+#review-form textarea,
+#review-form select {
+    margin-bottom: 10px;
+}
+
+#review-text {
+    padding: 8px;
+    height: 60px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+select#rating {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#reviews {
+    padding: 10px;
+}
+
+.review-card {
+    align-items: flex-start;
+    padding: 15px;
+    min-height: 150px;
+    margin-bottom: 15px;
+}
+
+#place-details > div {
+    margin-bottom: 15px;
+}
+
+footer {
+    background-color: #ff9800;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+    outline: 2px solid #ff9800;
+}
+
+button:focus {
+    outline: none;
+}
+

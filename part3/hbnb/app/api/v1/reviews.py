@@ -40,7 +40,7 @@ class ReviewList(Resource):
     @api.expect(review_model, validate=True)
     @api.response(201, 'Review successfully created', review_model_output)
     @api.response(400, 'Invalid input data', error)
-    @api.response(403, 'Unauthorized action', error)
+    @api.response(401, 'Invalid credentials', error)
     @jwt_required()
     def post(self):
         """Register a new review"""
